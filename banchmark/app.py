@@ -43,6 +43,10 @@ def log_to_excel(url, method, test_type, num_requests, result_summary):
 
 
 def run_test():
+    progress.start(10)
+    run_button.config(state='disabled')
+
+
     url = url_entry.get()
     method = method_combo.get()
     test_type = test_type_combo.get()
@@ -85,13 +89,22 @@ def run_test():
             result_text.insert(tk.END, f"Timp maxim: {max_:.2f} ms\n")
 
     elif test_type == "Rata de iesire":
-        results = incremental_output_rate_test(url, method, data)
+        results = incremental_output_rate_test(url, result_text, method, data)
+        max_rate = 0
         for count, rate in results:
-            result_text.insert(tk.END, f"{count} requesturi => {rate:.2f} req/s\n")
+            max_rate = max(max_rate, rate)
+            #result_text.insert(tk.END, f"{count} requesturi => {rate:.2f} req/s\n")
+        result_text.insert(tk.END, f"Output Rate: {max_rate:.2f} req/s\n")
+
 
     result_summary = result_text.get("1.0", tk.END)
     log_to_excel(url, method, test_type, num_requests, result_summary)
     result_text.config(state='disabled')
+
+    progress.stop()
+    run_button.config(state='normal')
+
+
 
 def toggle_testType_input(*args):
     if test_type_combo.get() == "Timp de raspuns":
@@ -193,12 +206,17 @@ payload_label.grid_remove()
 payload_text.grid_remove()
 
 
-run_button = tk.Button(root, text="Rulare test", command=run_test)
+#run_button = tk.Button(root, text="Rulare test", command=run_test)
+def threaded_run():
+    threading.Thread(target=run_test, daemon=True).start()
+run_button = tk.Button(root, text="Rulare test", command=threaded_run)
 run_button.grid(row=5, column=0, columnspan=3, pady=10)
 valid_url(False, 0)
 
 result_text = scrolledtext.ScrolledText(root, height=10, width=60, state='disabled')
 result_text.grid(row=6, column=0, columnspan=3, padx=10, pady=5)
 
+progress = ttk.Progressbar(root, orient="horizontal", mode="indeterminate", length=400)
+progress.grid(row=7, column=0, columnspan=3, padx=10, pady=10)
 
 root.mainloop()

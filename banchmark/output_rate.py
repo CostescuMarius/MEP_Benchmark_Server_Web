@@ -1,3 +1,4 @@
+import tkinter as tk
 import requests
 import time
 import concurrent.futures
@@ -43,7 +44,7 @@ def measure_concurrent_output_rate(url, num_requests, request_type="GET", data=N
     return output_rate, successful_requests, elapsed_time
 
 
-def incremental_output_rate_test(url, request_type="GET", data=None, threshold_diff=0.05):
+def incremental_output_rate_test(url, result_text, request_type="GET", data=None, threshold_diff=0.05):
     request_counts = []
     output_rates = []
 
@@ -61,6 +62,7 @@ def incremental_output_rate_test(url, request_type="GET", data=None, threshold_d
         if success == 0:
             return list(zip([0], [0]))
 
+        result_text.insert(tk.END, f"{num_requests} requesturi => {rate:.2f} req/s\n")
         request_counts.append(num_requests)
         output_rates.append(rate)
 
