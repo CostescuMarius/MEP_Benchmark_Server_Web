@@ -61,6 +61,8 @@ def run_test():
                 raise ValueError
     except ValueError:
         messagebox.showerror("Eroare", "Numarul de cereri trebuie sa fie un numar pozitiv.")
+        progress.stop()
+        run_button.config(state='normal')
         return
 
 
@@ -70,6 +72,8 @@ def run_test():
             data = json.loads(payload_text.get("1.0", tk.END).strip())
         except json.JSONDecodeError:
             messagebox.showerror("Eroare", "JSON invalid.")
+            progress.stop()
+            run_button.config(state='normal')
             return
     else:
         data = None

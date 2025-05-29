@@ -17,6 +17,7 @@ def measure_GET_response_time(url):
         if response.status_code != 200:
             print(f"Error: {response.status_code}")
             return None
+        
 
         return (end_time - start_time) * 1000
     except Exception as e:
